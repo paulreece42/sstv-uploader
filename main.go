@@ -133,7 +133,7 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
             Bucket: aws.String(S3_BUCKET),
             Key:    aws.String(sstv_id + ".png"),
         })
-        link, err := req.Presign(15 * time.Minute)
+        link, err := req.Presign(120 * time.Minute)
 
         checkErr(err)
 
@@ -185,7 +185,7 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
             Bucket: aws.String(S3_BUCKET),
             Key:    aws.String(sstv_id + ".png"),
         })
-        link, err := req.Presign(15 * time.Minute)
+        link, err := req.Presign(120 * time.Minute)
 
         checkErr(err)
 
