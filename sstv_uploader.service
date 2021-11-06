@@ -1,0 +1,11 @@
+[Unit]
+Description=Node Exporter
+
+[Service]
+User=sstvguy
+EnvironmentFile=/etc/sysconfig/sstv_uploader
+ExecStart=/usr/local/bin/sstv_uploader
+
+[Install]
+WantedBy=multi-user.target
+Wants=postgresql.service
