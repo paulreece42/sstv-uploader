@@ -14,3 +14,6 @@ And post images from MMSSTV/QSSTV using something like Facebook's watchman or Li
 
     curl -XPOST -H 'Bearer: foobarbaz' -H 'Content-Type: multipart/form-data' --form 'file=@Hist6.bmp' localhost:14230/sstv/
 
+
+
+Thanks to https://www.section.io/engineering-education/build-a-rest-api-application-using-golang-and-postgresql-database/ and https://stackoverflow.com/questions/40684307/how-can-i-receive-an-uploaded-file-using-a-golang-net-http-server for getting me started, hopefully I didn't forget too many other sources :-/
