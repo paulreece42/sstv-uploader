@@ -42,6 +42,12 @@ ALTER TABLE ONLY public.sstv
 
 
 --
--- PostgreSQL database dump complete
+-- Name: md5idx; Type: INDEX; Schema: public; Owner: sstv
 --
 
+CREATE UNIQUE INDEX md5idx ON public.sstv USING btree (md5sum);
+
+
+--
+-- PostgreSQL database dump complete
+--

@@ -55,7 +55,6 @@ func checkErr(err error) {
 }
 
 
-// DB set up
 func setupDB() *sql.DB {
     dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
     db, err := sql.Open("postgres", dbinfo)
@@ -91,7 +90,6 @@ func main() {
 //    router.HandleFunc("/sstv/{sstvid}", DeleteSSTV).Methods("DELETE")
 
 
-    // serve the app
     fmt.Println("Server at 14230")
     log.Fatal(http.ListenAndServe(":14230", router))
 }
@@ -121,14 +119,12 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
 
 
 
-    // Foreach movie
     for rows.Next() {
         var sstv_id string
         var uploadtime string
 
         err = rows.Scan(&sstv_id, &uploadtime)
 
-        // check errors
         checkErr(err)
 
         req, _ := mys3.GetObjectRequest(&s3.GetObjectInput{
@@ -173,14 +169,12 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
 
 
 
-    // Foreach movie
     for rows.Next() {
         var sstv_id string
         var uploadtime string
 
         err = rows.Scan(&sstv_id, &uploadtime)
 
-        // check errors
         checkErr(err)
 
         req, _ := mys3.GetObjectRequest(&s3.GetObjectInput{
