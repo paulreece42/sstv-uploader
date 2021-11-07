@@ -106,7 +106,7 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
     db := setupDB()
 
     printMessage("Getting sstv...")
-    rows, err := db.Query("SELECT * FROM sstv order by uploaded_at desc")
+    rows, err := db.Query("SELECT (sstvid, uploaded_at) FROM sstv order by uploaded_at desc")
     checkErr(err)
 
     var SSTVs []SSTV
@@ -156,7 +156,7 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
     db := setupDB()
 
     printMessage("Getting sstv...")
-    rows, err := db.Query("SELECT * FROM sstv order by uploaded_at desc limit 10 offset $1", page * 10)
+    rows, err := db.Query("SELECT (sstvid, uploaded_at) FROM sstv order by uploaded_at desc limit 10 offset $1", page * 10)
     checkErr(err)
 
     var SSTVs []SSTV
