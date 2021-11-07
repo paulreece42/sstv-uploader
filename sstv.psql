@@ -21,19 +21,20 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: sstv; Type: TABLE; Schema: public; Owner: postgres
+-- Name: sstv; Type: TABLE; Schema: public; Owner: sstv
 --
 
 CREATE TABLE public.sstv (
     sstvid uuid NOT NULL,
-    uploaded_at timestamp with time zone DEFAULT now()
+    uploaded_at timestamp with time zone DEFAULT now(),
+    md5sum text
 );
 
 
-ALTER TABLE public.sstv OWNER TO postgres;
+ALTER TABLE public.sstv OWNER TO sstv;
 
 --
--- Name: sstv sstv_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: sstv sstv_pkey; Type: CONSTRAINT; Schema: public; Owner: sstv
 --
 
 ALTER TABLE ONLY public.sstv
@@ -41,12 +42,6 @@ ALTER TABLE ONLY public.sstv
 
 
 --
--- Name: TABLE sstv; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.sstv TO sstv;
-
-
---
 -- PostgreSQL database dump complete
 --
+

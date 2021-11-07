@@ -11,6 +11,8 @@ import (
     "time"
     "os"
     "strconv"
+    "crypto/md5"
+    "encoding/hex"
 
     "image"
     "image/png"
@@ -141,7 +143,7 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
     }
 
     var response = JsonResponse{Type: "success", Data: SSTVs}
-
+    db.Close()
     json.NewEncoder(w).Encode(response)
 }
 
@@ -193,7 +195,7 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
     }
 
     var response = JsonResponse{Type: "success", Data: SSTVs}
-
+    db.Close()
     json.NewEncoder(w).Encode(response)
 }
 
@@ -221,7 +223,25 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
     s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION), Endpoint: aws.String(S3_ENDPOINT)})
     checkErr(err)
 
+    db := setupDB()
 
+    hash := md5.Sum(buf.Bytes())
+    mysum := hex.EncodeToString(hash[:])
+
+    fmt.Printf("md5sum: %s\n", mysum)
+
+    var cnt int
+
+    rows, err := db.Query("SELECT count(*) as cnt FROM sstv where md5sum = $1", mysum)
+    checkErr(err)
+    rows.Next()
+    rows.Scan(&cnt)
+    if (cnt > 0) {
+        response := JsonResponse{Type: "error", Message: "Content already exists"}
+        json.NewEncoder(w).Encode(response)
+        return
+    }
+    fmt.Printf("return %d", cnt)
     mys3 := s3.New(s)
 
     var size int64 = int64(buf.Len())
@@ -233,8 +253,6 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
         Body:                 bytes.NewReader(buf.Bytes()),
         ContentLength:        aws.Int64(size),
         ContentType:          aws.String(http.DetectContentType(buf.Bytes())),
-//        ContentDisposition:   aws.String("attachment"),
-//        ServerSideEncryption: aws.String("AES256"),
     })
     checkErr(err)
 
@@ -264,19 +282,19 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
 
     response = JsonResponse{Type: "success", Message: myuuid}
 
-    db := setupDB()
+    
 
     printMessage("Inserting SSTV into DB")
 
     fmt.Println("Inserting new SSTV with ID: " + myuuid)
 
     var lastInsertID string
-    err = db.QueryRow("insert into sstv (sstvid) values ($1) returning sstvid", myuuid).Scan(&lastInsertID)
+    err = db.QueryRow("insert into sstv (sstvid, md5sum) values ($1, $2) returning sstvid", myuuid, mysum).Scan(&lastInsertID)
 
     // check errors
     checkErr(err)
 
     response = JsonResponse{Type: "success", Message: "Successfully posted: " + lastInsertID}
-
+    db.Close()
     json.NewEncoder(w).Encode(response)
 }
