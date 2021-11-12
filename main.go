@@ -76,6 +76,7 @@ type JsonResponse struct {
     Message string `json:"message"`
 }
 
+var db = setupDB()
 
 func main() {
 
@@ -103,11 +104,12 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    db := setupDB()
+    
 
     printMessage("Getting sstv...")
     rows, err := db.Query("SELECT sstvid, uploaded_at FROM sstv order by uploaded_at desc")
     checkErr(err)
+    defer rows.Close()
 
     var SSTVs []SSTV
 
@@ -139,7 +141,6 @@ func GetSSTV(w http.ResponseWriter, r *http.Request) {
     }
 
     var response = JsonResponse{Type: "success", Data: SSTVs}
-    db.Close()
     json.NewEncoder(w).Encode(response)
 }
 
@@ -153,11 +154,11 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
     page, err := strconv.Atoi(params["page"])
 
-    db := setupDB()
 
     printMessage("Getting sstv...")
     rows, err := db.Query("SELECT sstvid, uploaded_at FROM sstv order by uploaded_at desc limit 10 offset $1", page * 10)
     checkErr(err)
+    defer rows.Close()
 
     var SSTVs []SSTV
 
@@ -189,7 +190,6 @@ func GetSSTVPage(w http.ResponseWriter, r *http.Request) {
     }
 
     var response = JsonResponse{Type: "success", Data: SSTVs}
-    db.Close()
     json.NewEncoder(w).Encode(response)
 }
 
@@ -217,7 +217,6 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
     s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION), Endpoint: aws.String(S3_ENDPOINT)})
     checkErr(err)
 
-    db := setupDB()
 
     hash := md5.Sum(buf.Bytes())
     mysum := hex.EncodeToString(hash[:])
@@ -237,6 +236,7 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
     }
     fmt.Printf("return %d", cnt)
     mys3 := s3.New(s)
+    defer rows.Close()
 
     var size int64 = int64(buf.Len())
 
@@ -289,6 +289,5 @@ func CreateSSTV(w http.ResponseWriter, r *http.Request) {
     checkErr(err)
 
     response = JsonResponse{Type: "success", Message: "Successfully posted: " + lastInsertID}
-    db.Close()
     json.NewEncoder(w).Encode(response)
 }
