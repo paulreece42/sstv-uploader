@@ -1,0 +1,16 @@
+
+# Build static binary:
+
+CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/sstv-uploader
+podman build . -t test-sstv
+
+podman run -dp 14230:14230 -e AWS_ACCESS_KEY_ID=changeme \
+ -e AWS_SECRET_ACCESS_KEY=changeme \
+ -e DB_HOST=10.88.0.27 \
+ =e DB_USER=postgres \
+ -e DB_PASS=mysecretsstvpassword \
+ -e DB_NAME=postgres \
+ -e S3_REGION=us-east-2 \
+ -e S3_BUCKET=psychic-spork \
+ -e S3_ENDPOINT=s3.amazonaws.com \
+ -e BEARER_TOKEN=foobarbaz test-sstv
