@@ -31,6 +31,7 @@ var (
     DB_USER string = os.Getenv("DB_USER")
     DB_PASSWORD string = os.Getenv("DB_PASS")
     DB_NAME string = os.Getenv("DB_NAME")
+    DB_HOST string = os.Getenv("DB_HOST")
 
     S3_REGION string = os.Getenv("S3_REGION")
     S3_BUCKET string = os.Getenv("S3_BUCKET")
@@ -56,7 +57,7 @@ func checkErr(err error) {
 
 
 func setupDB() *sql.DB {
-    dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
+    dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s", DB_USER, DB_PASSWORD, DB_NAME, DB_HOST)
     db, err := sql.Open("postgres", dbinfo)
 
     checkErr(err)
